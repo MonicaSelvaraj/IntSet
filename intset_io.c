@@ -27,6 +27,9 @@ IntSet newSet (int size){
 
 /****************************** PARSING INPUT ********************************/
 
+/* Defining a macro to check for valid positive integers */
+#define IS_POSITIVE_INTEGER(i) ((i >= 0 ) && (i <= INT_MAX))
+
 /* STEPS TO CHECK INPUT VALIDITY
  * First strip off trailing whitespace before first and last character. 
  * The first character should be '{'. 
@@ -43,14 +46,38 @@ IntSet newSet (int size){
  * Output is a boolean. 
  */
 
+bool isValidSet(){
+	//Check empty set
+	//Only one element 
+	
 
-/* TODO: Function to check the validity of a number in the set. 
+	//If more than one comma separated value is present, none of those values can be whitespace - isValidNum is set up to reflect this. 
+	
+}
+
+
+/* Function to check the validity of a number in the set.
+ * The function is used only for non-empty sets  
  * Input is a string.
  * Output is a boolean. 
  */
 bool isValidNum(char* num){
+
 	//Whitespace should not matter - so strip leading and trailing whitespace
+	char* trimmedNum = removeWhitespace(num);
+
+	//Checking for empty string - empty string is not valid when multiple comma separated integers are present in the set
+	if(*trimmedNum == 0) return false;
+
+	//Checking that there are no whitespaces, decimal points or special characters in the trimmedNum
+	char* trimmedLast;
+	trimmedLast = trimmedNum + strlen(trimmedNum) - 1;
+	while(trimmedNum <= trimmedLast){
+		if(!(IS_POSITIVE_INTEGER(atoi(*trimmedNum)))){
+			return false;
+		trimmedNum++;
 	
+	return true;
 }
 
 /* This function removes leading and trailing whitespace.
@@ -81,4 +108,4 @@ char* removeWhitespace(char* input){
   return input;
 }
 
-/*****************************************************************************/
+/*************************** END OF INPUT PARSING ***************************/
