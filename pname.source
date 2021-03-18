@@ -1,0 +1,104 @@
+-- standard input output functions
+CREATE FUNCTION pname_in(cstring)
+   RETURNS PersonName
+   AS '_OBJWD_/pname'
+   LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION pname_out(PersonName)
+   RETURNS cstring
+   AS '_OBJWD_/pname'
+   LANGUAGE C IMMUTABLE STRICT;
+
+-- the actual data type!
+CREATE TYPE PersonName (
+   internallength = VARIABLE,
+   input = pname_in,
+   output = pname_out,
+   alignment = int4
+);
+
+-- functions that has to be defined for assignment
+CREATE FUNCTION given(PersonName) RETURNS text
+   AS '_OBJWD_/pname','pname_given_text'
+   LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION show(PersonName) RETURNS text
+   AS '_OBJWD_/pname','pname_show_text'
+   LANGUAGE C IMMUTABLE STRICT;
+
+-- as above, but returns text
+CREATE FUNCTION family(PersonName) RETURNS text
+   AS '_OBJWD_/pname','pname_family_text'
+   LANGUAGE C IMMUTABLE STRICT;
+
+-- functions for binary comparison operators
+CREATE FUNCTION pname_eq(PersonName, PersonName) RETURNS bool
+   AS '_OBJWD_/pname' LANGUAGE C IMMUTABLE STRICT;
+CREATE FUNCTION pname_gt(PersonName, PersonName) RETURNS bool
+   AS '_OBJWD_/pname' LANGUAGE C IMMUTABLE STRICT;
+CREATE FUNCTION pname_ge(PersonName, PersonName) RETURNS bool
+   AS '_OBJWD_/pname' LANGUAGE C IMMUTABLE STRICT;
+CREATE FUNCTION pname_ne(PersonName, PersonName) RETURNS bool
+   AS '_OBJWD_/pname' LANGUAGE C IMMUTABLE STRICT;
+CREATE FUNCTION pname_lt(PersonName, PersonName) RETURNS bool
+   AS '_OBJWD_/pname' LANGUAGE C IMMUTABLE STRICT;
+CREATE FUNCTION pname_le(PersonName, PersonName) RETURNS bool
+   AS '_OBJWD_/pname' LANGUAGE C IMMUTABLE STRICT;
+
+-- index support functions
+CREATE FUNCTION pname_sint_cmp(PersonName, PersonName) RETURNS int4
+   AS '_OBJWD_/pname' LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION pname_hash(PersonName) RETURNS int4
+   AS '_OBJWD_/pname' LANGUAGE C IMMUTABLE STRICT;
+   
+-- define basic comparison binary operators upon PersonName type
+CREATE OPERATOR < (
+   leftarg = PersonName, rightarg = PersonName, function = pname_lt,
+   commutator = > , negator = >= ,
+   restrict = scalarltsel, join = scalarltjoinsel
+);
+CREATE OPERATOR <= (
+   leftarg = PersonName, rightarg = PersonName, function = pname_le,
+   commutator = >= , negator = > ,
+   restrict = scalarlesel, join = scalarlejoinsel
+);
+CREATE OPERATOR = (
+   leftarg = PersonName, rightarg = PersonName, function = pname_eq,
+   commutator = = , negator = <> ,
+   restrict = eqsel, join = eqjoinsel, hashes
+);
+CREATE OPERATOR <> (
+   leftarg = PersonName, rightarg = PersonName, function = pname_ne,
+   commutator = <> , negator = = ,
+   restrict = neqsel, join = neqjoinsel
+);
+CREATE OPERATOR >= (
+   leftarg = PersonName, rightarg = PersonName, function = pname_ge,
+   commutator = <= , negator = < ,
+   restrict = scalargesel, join = scalargejoinsel
+);
+CREATE OPERATOR > (
+   leftarg = PersonName, rightarg = PersonName, function = pname_gt,
+   commutator = < , negator = <= ,
+   restrict = scalargtsel, join = scalargtjoinsel
+);
+
+-- index support operator class
+-- see 37.16 (v12.1) for strategy/function number
+
+CREATE OPERATOR CLASS person_hash_ops
+  DEFAULT FOR TYPE PersonName USING hash AS
+    OPERATOR 1 = ,
+    FUNCTION 1 pname_hash(PersonName);
+
+-- while we're at it, why not include BTree support also? :)
+-- turns out that this is also required for sorting!
+CREATE OPERATOR CLASS person_btree_ops
+  DEFAULT FOR TYPE PersonName USING btree AS
+    OPERATOR 1 < ,
+    OPERATOR 2 <= ,
+    OPERATOR 3 = ,
+    OPERATOR 4 >= ,
+    OPERATOR 5 > ,
+    FUNCTION 1 pname_sint_cmp(PersonName, PersonName);

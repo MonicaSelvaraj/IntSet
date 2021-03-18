@@ -1,0 +1,119 @@
+---------------------------------------------------------------------------
+
+---------------------------------------------------------------------------
+
+CREATE FUNCTION intset_in(cstring)
+   RETURNS Integer
+   AS '_OBJWD_/integer'
+   LANGUAGE C IMMUTABLE STRICT;
+
+
+CREATE FUNCTION intset_out(integer)
+   RETURNS cstring
+   AS '_OBJWD_/integer'
+   LANGUAGE C IMMUTABLE STRICT;
+
+-- Actual Datatype 
+
+CREATE TYPE integer (
+   internallength = 8,
+   input = intset_in,
+   output = intset_out,
+   alignment = integer
+);
+
+
+---------------------------------------------------------------
+-- Functions specific to the assignment 
+
+---------------------------------------------------------------
+
+
+
+-----------------------------
+-- Creating an operator for the new type:
+
+-----------------------------
+
+-- first, define a function complex_add (also in complex.c)
+CREATE FUNCTION integer_add(integer, integer)
+   RETURNS integer
+   AS '_OBJWD_/integer'
+   LANGUAGE C IMMUTABLE STRICT;
+
+CREATE OPERATOR + (
+   leftarg = integer,
+   rightarg = integer,
+   procedure = integer_add,
+   commutator = +
+);
+
+CREATE FUNCTION intset_contains(set, set) 
+    RETURNS bool
+    AS '_OBJWD_/intset'
+    LANGUAGE C IMMUTABLE STRICT;
+    
+CREATE FUNCTION intset_card(set) 
+    RETURNS int4
+    AS '_OBJWD_/intset'
+    LANGUAGE C IMMUTABLE STRICT;
+    
+CREATE FUNCTION intset_eq(set, set) 
+    RETURNS bool
+    AS '_OBJWD_/intset'
+    LANGUAGE C IMMUTABLE STRICT;
+    
+CREATE FUNCTION intset_neq(set, set) 
+    RETURNS bool
+    AS '_OBJWD_/intset'
+    LANGUAGE C IMMUTABLE STRICT;
+    
+CREATE FUNCTION intset_inter(set, set) 
+    RETURNS set
+    AS '_OBJWD_/intset'
+    LANGUAGE C IMMUTABLE STRICT;
+
+CREATE OPERATOR ? (
+   leftarg = set,
+   rightarg = set,
+   procedure = intset_contains,
+   commutator = ?
+);
+
+CREATE OPERATOR # (
+   leftarg = set,
+   rightarg = set,
+   procedure = intset_card,
+   commutator = #
+);
+
+CREATE OPERATOR = (
+   leftarg = set,
+   rightarg = set,
+   procedure = intset_eq,
+   commutator = =, negator = <>
+   restrict = eqsel, join = eqjoinsel
+);
+
+CREATE OPERATOR <> (
+   leftarg = set,
+   rightarg = set,
+   procedure = intset_neq,
+   commutator = <>, negator = =
+   restrict = neqsel, join = neqjoinsel
+);
+
+CREATE OPERATOR && (
+   leftarg = set,
+   rightarg = set,
+   procedure = intset_inter,
+   commutator = && 
+   restrict = eqsel, join = eqjoinsel
+);
+
+
+
+
+
+
+
