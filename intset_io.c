@@ -1,27 +1,27 @@
+/*
 #include "postgres.h"
 #include "fmgr.h"
 #include "utils/hashutils.h"
 #include <stdint.h>
 PG_MODULE_MAGIC;
+*/
 
 /*************************** INTSET TYPE CREATION *****************************/
 
 /* Representation for a set of integers */
 typedef struct {
         int size;
-        int elems[1];
+        int integers[];
 }IntSet;
 
-/* Function to create a new set */
-IntSet newSet (int size){
-        IntSet *set;
-        set = malloc(sizeof(IntSet) + sizeof(int)*(size-1));
-        if(set) set->size = size;
-        return set;
+/* Function to create a new IntSet */
+IntSet newIntSet (int size){
+        IntSet *newSet;
+        newSet = malloc(sizeof(IntSet) + sizeof(int)*(size-1));
+        if(newSet) newSet->size = size;
+	newSet->integers[size] = 0;
+        return newSet;
 }
-/* use set->elems[0] = 1;.. to store the integers in the set */
-/* you need to keep the array sorted - will make comparing two sets easier */
-/* for the set of sets you can use a hash table/dynamically allocated array */
 
 /*****************************************************************************/
 
@@ -47,11 +47,27 @@ IntSet newSet (int size){
  */
 
 bool isValidSet(){
-	//Check empty set
-	//Only one element 
+	//Remove leadng and trailing spaces 
 	
+	//Check if the first character is a '{'
 
+	//Check if the last character is a '}'
+
+	//Get substring between '{' and '}'
+	
+	//Split into comma separated values and store in an array
+
+	//Case 1 - only one element in the set 
+	//If there is only one element in the set, check if the set is empty 
+	//If non-empty set, remove preceeding 0's if present and check isValidNum 
+	
+	//Case 2 - more than one element in the set
+	//Remove trailing 0's, check if valid num
 	//If more than one comma separated value is present, none of those values can be whitespace - isValidNum is set up to reflect this. 
+	
+	//Remove duplicates and sort array
+	//Make newIntSet
+
 	
 }
 
