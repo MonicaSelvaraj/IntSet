@@ -79,12 +79,11 @@ char* removeZeros(char* input){
 	char* last;
 	last = input + strlen(input) - 1;
 
-	while(input <= last){
-                if((*input) == '0'){
-                        return false;
-                trimmedNum++;
-
-
+	while(input < last){
+                if((unsigned char)*input == '0'){
+                        input++;
+        return input;
+}
 
 /* Function to check the validity of a number in the set.
  * The function is used only for non-empty sets  
@@ -112,6 +111,8 @@ int isValidNum(char* num){
 	
 	//Check if whole number is between 0 and INT_MAX
 	if(!(full_num >= 0 && full_num <= INT_MAX)) return -1;
+
+	//Remove preceeding 0's if present
 
 	return full_num;
 }
