@@ -17,7 +17,7 @@ typedef struct {
 }IntSet;
 
 /* Function to create a new IntSet */
-IntSet newIntSet (int size, int* elements){
+IntSet newIntSet(int size, int* elements){
         IntSet *newSet;
         newSet = malloc(sizeof(IntSet) + sizeof(int)*(size-1));
         if(newSet) newSet->size = size;
@@ -131,12 +131,12 @@ IntSet isValidSet(char* input){
         //Check if the first character is a '{'
         char* first;
         first = trimmedInput;
-        if(*first != '{') return false;
+        if(*first != '{') return NULL;
 
         //Check if the last character is a '}'
         char* last;
         last = first + strlen(first) - 1;
-        if(*last != '}') return false;
+        if(*last != '}') return NULL;
 
         //Get substring between '{' and '}'
         first = first + 1; last = last - 1;
@@ -168,7 +168,7 @@ IntSet isValidSet(char* input){
 		if(valid_num != -1){
 			elements[size] = valid_num;
 			size++;
-			p = strtok(NULL, delim);
+			p = strtok(NULL, delimiter);
 		else return NULL;		
 	}
 	//TODO: Remove duplicates and sort elements array
