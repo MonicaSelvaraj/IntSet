@@ -96,7 +96,9 @@ int isValidNum(char* num){
 	char* trimmedNum = removeWhitespace(num);
 	
 	//Converting char* to int to check if final number is a positive integer within range
-	int full_num = atoi(trimmedNum);
+	//after removing preceeding 0's, if present 
+	char* zerosRemNum = removeZeros(trimmedNum);
+	int full_num = atoi(zerosRemNum);
 
 	//Checking for empty string - empty string is not valid when multiple comma separated integers are present in the set
 	if(*trimmedNum == 0) return -1;
@@ -112,8 +114,6 @@ int isValidNum(char* num){
 	//Check if whole number is between 0 and INT_MAX
 	if(!(full_num >= 0 && full_num <= INT_MAX)) return -1;
 
-	//Remove preceeding 0's if present
-
 	return full_num;
 }
 
@@ -122,8 +122,12 @@ int isValidNum(char* num){
  * Output is a boolean.
  */
 
-bool isValidSet(char* input){
-        //Remove leadng and trailing spaces
+int* isValidSet(char* input){
+
+	//Array to store set elements
+	int* elements;
+
+	//Remove leadng and trailing spaces
         char* trimmedInput = removeWhitespace(input);
 
         //Check if the first character is a '{'
@@ -139,21 +143,33 @@ bool isValidSet(char* input){
         //Get substring between '{' and '}'
         first = first + 1; last = last - 1;
 
-        //Split into comma separated values and store in an array
-        int size = 0;
-
-        //Case 1 - only one element in the set
-        //If there is only one element in the set, check if the set is empty
-        //If non-empty set, remove preceeding 0's if present and check isValidNum
-
-        //Case 2 - more than one element in the set
-        //Remove trailing 0's, check if valid num
-        //If more than one comma separated value is present, none of those values can be whitespace - isValidNum is set up to reflect this.
-
-        //Remove duplicates and sort array
-        //Make newIntSet
-
-
+        //Split into comma separated values and store in an int array
+        int size = 0; //size of int array, i.e. number of elements in the int set
+	char delimiter[] = ",";
+	char* p = strtok(first, delimiter);
+	while(p != NULL){
+		int valid_num;
+		//Case 1 - only one element in the set 
+		if(strcmp(p,first) == 0){
+			//Check if the set is an empty-set
+			if(*p == 0) 
+				elements[0] = "";
+			//If the set is non-empty, check if element isValidNum
+			valid_num = isValidNum(p);
+			else if(valid_num != -1){
+				elements[0] = valid_num;
+				size++; //int set has one element
+			}
+			return elements;
+		}		
+		//Case 2 - more than one element in the set
+		valid_num = isValidNum(p);
+		elements[size] = valid_num;
+		size++;
+		p = strtok(NULL, delim);		
+	}
+	//Remove duplicates and sort elements array
+	return elements;
 }
 
 /*************************** END OF INPUT PARSING ***************************/
