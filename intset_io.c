@@ -8,8 +8,6 @@ PG_MODULE_MAGIC;
 
 /* functions that check the validity of int sets */
 
-
-
 /*************************** INTSET TYPE CREATION *****************************/
 
 /* Representation for a set of integers */
@@ -19,11 +17,11 @@ typedef struct {
 }IntSet;
 
 /* Function to create a new IntSet */
-IntSet newIntSet (int size){
+IntSet newIntSet (int size, int* elements){
         IntSet *newSet;
         newSet = malloc(sizeof(IntSet) + sizeof(int)*(size-1));
         if(newSet) newSet->size = size;
-	newSet->integers[size] = 0;
+	newSet->integers = elements;
         return newSet;
 }
 
@@ -119,10 +117,10 @@ int isValidNum(char* num){
 
 /* Function to check the validity of a set
  * Input is a string.
- * Output is a boolean.
+ * Output is an IntSet.
  */
 
-int* isValidSet(char* input){
+IntSet isValidSet(char* input){
 
 	//Array to store set elements
 	int* elements;
@@ -152,24 +150,29 @@ int* isValidSet(char* input){
 		//Case 1 - only one element in the set 
 		if(strcmp(p,first) == 0){
 			//Check if the set is an empty-set
-			if(*p == 0) 
+			if(*p == 0){
 				elements[0] = "";
+				return newIntSet (size, elements);
+			}
 			//If the set is non-empty, check if element isValidNum
 			valid_num = isValidNum(p);
 			else if(valid_num != -1){
 				elements[0] = valid_num;
 				size++; //int set has one element
-			}
-			return elements;
+				return newIntSet (size, elements);
+			} 
+			else return NULL;
 		}		
 		//Case 2 - more than one element in the set
 		valid_num = isValidNum(p);
-		elements[size] = valid_num;
-		size++;
-		p = strtok(NULL, delim);		
+		if(valid_num != -1){
+			elements[size] = valid_num;
+			size++;
+			p = strtok(NULL, delim);
+		else return NULL;		
 	}
-	//Remove duplicates and sort elements array
-	return elements;
+	//TODO: Remove duplicates and sort elements array
+	return newIntSet(size, elements);
 }
 
 /*************************** END OF INPUT PARSING ***************************/
