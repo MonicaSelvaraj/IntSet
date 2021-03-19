@@ -1,10 +1,14 @@
-/*
 #include "postgres.h"
 #include "fmgr.h"
 #include "utils/hashutils.h"
+#include <stdlib.h>
 #include <stdint.h>
+
 PG_MODULE_MAGIC;
-*/
+
+/* functions that check the validity of int sets */
+
+
 
 /*************************** INTSET TYPE CREATION *****************************/
 
@@ -27,9 +31,6 @@ IntSet newIntSet (int size){
 
 /****************************** PARSING INPUT ********************************/
 
-/* Defining a macro to check for valid positive integers */
-#define IS_POSITIVE_INTEGER(i) ((i >= 0 ) && (i <= INT_MAX))
-
 /* STEPS TO CHECK INPUT VALIDITY
  * First strip off trailing whitespace before first and last character. 
  * The first character should be '{'. 
@@ -41,61 +42,6 @@ IntSet newIntSet (int size){
  *
  */
 
-/* TODO: Function to check the validity of a set 
- * Input is a string.
- * Output is a boolean. 
- */
-
-bool isValidSet(){
-	//Remove leadng and trailing spaces 
-	
-	//Check if the first character is a '{'
-
-	//Check if the last character is a '}'
-
-	//Get substring between '{' and '}'
-	
-	//Split into comma separated values and store in an array
-
-	//Case 1 - only one element in the set 
-	//If there is only one element in the set, check if the set is empty 
-	//If non-empty set, remove preceeding 0's if present and check isValidNum 
-	
-	//Case 2 - more than one element in the set
-	//Remove trailing 0's, check if valid num
-	//If more than one comma separated value is present, none of those values can be whitespace - isValidNum is set up to reflect this. 
-	
-	//Remove duplicates and sort array
-	//Make newIntSet
-
-	
-}
-
-
-/* Function to check the validity of a number in the set.
- * The function is used only for non-empty sets  
- * Input is a string.
- * Output is a boolean. 
- */
-bool isValidNum(char* num){
-
-	//Whitespace should not matter - so strip leading and trailing whitespace
-	char* trimmedNum = removeWhitespace(num);
-
-	//Checking for empty string - empty string is not valid when multiple comma separated integers are present in the set
-	if(*trimmedNum == 0) return false;
-
-	//Checking that there are no whitespaces, decimal points or special characters in the trimmedNum
-	char* trimmedLast;
-	trimmedLast = trimmedNum + strlen(trimmedNum) - 1;
-	while(trimmedNum <= trimmedLast){
-		if(!(IS_POSITIVE_INTEGER(atoi(*trimmedNum)))){
-			return false;
-		trimmedNum++;
-	
-	return true;
-}
-
 /* This function removes leading and trailing whitespace.
  * Returns a new, trimmed string.
  * Returns original string if it is just a whitespace character. 
@@ -103,7 +49,7 @@ bool isValidNum(char* num){
  */
 char* removeWhitespace(char* input){
 	
-	//Pointer for last character of input string 
+	//Pointer to last character of input string 
 	char* last;
 	last = input + strlen(input) - 1; 
   
@@ -122,6 +68,91 @@ char* removeWhitespace(char* input){
   	last[1] = '\0';
 
   return input;
+}
+
+/* This function removes preceeding 0's from a string of numbers, if present 
+ * Input is a string.
+ * Output is a string with preceeding 0's removed
+ */
+char* removeZeros(char* input){
+	//Pointer to the last character of the input string 
+	char* last;
+	last = input + strlen(input) - 1;
+
+	while(input <= last){
+                if((*input) == '0'){
+                        return false;
+                trimmedNum++;
+
+
+
+/* Function to check the validity of a number in the set.
+ * The function is used only for non-empty sets  
+ * Input is a string.
+ * Returns an int: -1 for failure, the valid int for success. 
+ */
+int isValidNum(char* num){
+
+	//Whitespace should not matter - so strip leading and trailing whitespace
+	char* trimmedNum = removeWhitespace(num);
+	
+	//Converting char* to int to check if final number is a positive integer within range
+	int full_num = atoi(trimmedNum);
+
+	//Checking for empty string - empty string is not valid when multiple comma separated integers are present in the set
+	if(*trimmedNum == 0) return -1;
+
+	//Checking that there are no whitespaces, decimal points or special characters in the trimmedNum - checking every character
+        char* trimmedLast;
+        trimmedLast = trimmedNum + strlen(trimmedNum) - 1;
+        while(trimmedNum <= trimmedLast){
+                if(!isdigit((unsigned char)*trimmedNum)){
+                        return -1;
+                trimmedNum++;	
+	
+	//Check if whole number is between 0 and INT_MAX
+	if(!(full_num >= 0 && full_num <= INT_MAX)) return -1;
+
+	return full_num;
+}
+
+/* Function to check the validity of a set
+ * Input is a string.
+ * Output is a boolean.
+ */
+
+bool isValidSet(char* input){
+        //Remove leadng and trailing spaces
+        char* trimmedInput = removeWhitespace(input);
+
+        //Check if the first character is a '{'
+        char* first;
+        first = trimmedInput;
+        if(*first != '{') return false;
+
+        //Check if the last character is a '}'
+        char* last;
+        last = first + strlen(first) - 1;
+        if(*last != '}') return false;
+
+        //Get substring between '{' and '}'
+        first = first + 1; last = last - 1;
+
+        //Split into comma separated values and store in an array
+        int size = 0;
+
+        //Case 1 - only one element in the set
+        //If there is only one element in the set, check if the set is empty
+        //If non-empty set, remove preceeding 0's if present and check isValidNum
+
+        //Case 2 - more than one element in the set
+        //Remove trailing 0's, check if valid num
+        //If more than one comma separated value is present, none of those values can be whitespace - isValidNum is set up to reflect this.
+
+        //Remove duplicates and sort array
+        //Make newIntSet
+
+
 }
 
 /*************************** END OF INPUT PARSING ***************************/
